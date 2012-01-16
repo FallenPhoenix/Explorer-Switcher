@@ -1,0 +1,18 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+# SharpDevelop 3.2.1.6466
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Explorer Switcher", "Explorer Switcher.csproj", "{E0A47008-4560-48AA-95B1-E38918AA0A16}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E0A47008-4560-48AA-95B1-E38918AA0A16}.Debug|x86.Build.0 = Debug|x86
+		{E0A47008-4560-48AA-95B1-E38918AA0A16}.Debug|x86.ActiveCfg = Debug|x86
+		{E0A47008-4560-48AA-95B1-E38918AA0A16}.Release|x86.Build.0 = Release|x86
+		{E0A47008-4560-48AA-95B1-E38918AA0A16}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+EndGlobal

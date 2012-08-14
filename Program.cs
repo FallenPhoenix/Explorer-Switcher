@@ -24,25 +24,35 @@ namespace Explorer_Switcher
 		[STAThread]
 		private static void Main(string[] args)
 		{
-			bool ext = (args.Length == 1 && args[0] == "-ext");
+			bool ok = false;
+			for (int i = 0; i < args.Length; i++)
+				switch (args[i])
+				{
+					case "-h": ChangeValue("Hidden", 3); ok = true; break;
+					case "-e": ChangeValue("HideFileExt", 1); ok = true; break;
+				}
 			
-			#region Реестр
+			if (ok) RefreshExplorer();
+			else MessageBox.Show("Приложение не имеет инферфейса и рассчитано на запуск с параметрами.\n\n-h Переключает отображение скрытых файлов.\n-e Переключает отображение расширений.", "Explorer Switcher");
+		}
+		
+		
+		static void ChangeValue(string keyname, int vsum)
+		{
 			string keypath = @"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced";
-			string keyname = (ext ? "HideFileExt" : "Hidden");
 			var key = Registry.CurrentUser.OpenSubKey(keypath);
 			int val = (int)key.GetValue(keyname);
 			key.Close();
 			key = Registry.CurrentUser.CreateSubKey(keypath);
-			key.SetValue(keyname, (ext ? 1 : 3) - val);
+			key.SetValue(keyname, vsum - val);
 			key.Close();
-			#endregion
-			
-			#if UpdateExplorer
-			RefreshExplorer();
-			#endif
 		}
 		
-		#if UpdateExplorer
+		static void RefreshExplorer()
+		{
+			RefreshWindow(IntPtr.Zero, "SHELLDLL_DefView", 0x7103);
+		}
+		
 		static void RefreshWindow(IntPtr parent, string win_class, uint wparam)
 		{
 			var window = IntPtr.Zero;
@@ -57,10 +67,18 @@ namespace Explorer_Switcher
 			}
 		}
 		
-		static void RefreshExplorer()
-		{
-			RefreshWindow(IntPtr.Zero, "SHELLDLL_DefView", 0x7103);
-		}
+		#region WinAPI-функции
+		[DllImport("user32.dll", SetLastError = true)]
+		static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
+		
+		[DllImport("user32.dll")]
+		static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
+		
+		[DllImport("user32.dll", SetLastError = true)]
+		static extern uint PostMessage(IntPtr hWnd, int Msg, uint wParam, int lParam);
+		
+		const int WM_COMMAND = 0x0111;
+		#endregion
 		
 		#region Код обновления в HiFiTo
 //		static void refreshWindow(HWND parent, TCHAR * winClass, WPARAM wparam){
@@ -81,19 +99,5 @@ namespace Explorer_Switcher
 //			refreshWindow(NULL, _T("SHELLDLL_DefView"), 0x7103);
 //		}
 		#endregion
-		
-		#region WinAPI-функции
-		[DllImport("user32.dll", SetLastError = true)]
-		static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
-		
-		[DllImport("user32.dll")]
-		static extern int GetClassName(IntPtr hWnd, StringBuilder lpClassName, int nMaxCount);
-		
-		[DllImport("user32.dll", SetLastError = true)]
-		static extern uint PostMessage(IntPtr hWnd, int Msg, uint wParam, int lParam);
-		
-		const int WM_COMMAND = 0x0111;
-		#endregion
-		#endif
 	}
 }

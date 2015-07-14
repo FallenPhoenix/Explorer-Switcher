@@ -25,15 +25,20 @@ namespace Explorer_Switcher
 		private static void Main(string[] args)
 		{
 			bool ok = false;
-			for (int i = 0; i < args.Length; i++)
-				switch (args[i])
+			foreach (string arg in args)
+				switch (arg.ToLower())
 				{
-					case "-h": ChangeValue("Hidden", 3); ok = true; break;
-					case "-e": ChangeValue("HideFileExt", 1); ok = true; break;
+					case "-sh": ChangeValue("Hidden", 3); ok = true; break;
+					case "-se": ChangeValue("HideFileExt", 1); ok = true; break;
+					case "-ue": SHChangeNotify(0x08000000 /*SHCNE_ASSOCCHANGED*/, 0 /*SHCNF_IDLIST*/, IntPtr.Zero, IntPtr.Zero); ok = true; break;
 				}
 			
 			if (ok) RefreshExplorer();
-			else MessageBox.Show("Приложение не имеет инферфейса и рассчитано на запуск с параметрами.\n\n-h Переключает отображение скрытых файлов.\n-e Переключает отображение расширений.", "Explorer Switcher");
+			else MessageBox.Show("Приложение не имеет инферфейса и рассчитано на запуск с параметрами.\n\n" + 
+			                     "-sh Переключает отображение скрытых файлов.\n" +
+			                     "-se Переключает отображение расширений.\n" +
+			                     "-ue Обновляет ассоциации типов файлов (заставляет перечитать из реестра).",
+			                     "Explorer Switcher");
 		}
 		
 		
@@ -61,13 +66,16 @@ namespace Explorer_Switcher
 			{
 				GetClassName(window, name, 128);
 				if (name.ToString() == win_class)
-					PostMessage(window, WM_COMMAND, wparam, 0);
+					PostMessage(window, 0x0111 /*WM_COMMAND*/, wparam, 0);
 				else
 					RefreshWindow(window, win_class, wparam);
 			}
 		}
 		
 		#region WinAPI-функции
+		[DllImport("shell32.dll")]
+		public static extern void SHChangeNotify(int eventID, uint flags, IntPtr item1, IntPtr item2);
+		
 		[DllImport("user32.dll", SetLastError = true)]
 		static extern IntPtr FindWindowEx(IntPtr hwndParent, IntPtr hwndChildAfter, string lpszClass, string lpszWindow);
 		
@@ -76,8 +84,6 @@ namespace Explorer_Switcher
 		
 		[DllImport("user32.dll", SetLastError = true)]
 		static extern uint PostMessage(IntPtr hWnd, int Msg, uint wParam, int lParam);
-		
-		const int WM_COMMAND = 0x0111;
 		#endregion
 		
 		#region Код обновления в HiFiTo

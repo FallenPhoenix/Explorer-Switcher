@@ -29,11 +29,21 @@ namespace Explorer_Switcher
 				}
 			
 			if (ok) RefreshExplorer();
-			else MessageBox.Show("Приложение не имеет инферфейса и рассчитано на запуск с параметрами.\n\n" + 
-			                     "-sh Переключает отображение скрытых файлов.\n" +
-			                     "-se Переключает отображение расширений.\n" +
-			                     "-ue Обновляет ассоциации типов файлов (заставляет перечитать из реестра).",
-			                     "Explorer Switcher");
+			else
+			{
+				// Русский язык для России, Украины и Белоруссии
+				var lang = System.Globalization.CultureInfo.CurrentUICulture.Parent.Name;
+				MessageBox.Show((lang == "ru" || lang == "uk" || lang == "be")
+					? "Приложение не имеет инферфейса и рассчитано на запуск с параметрами.\n\n" +
+					  "-sh Переключает отображение скрытых файлов.\n" +
+					  "-se Переключает отображение расширений.\n" +
+					  "-ue Обновляет ассоциации типов файлов (заставляет перечитать из реестра)."
+					: "This program has no own GUI and made for using from command line.\n\n" +
+					  "-sh Switch visibility of hidden files.\n" +
+					  "-se Switch visibility of extentions.\n" +
+					  "-ue Update file associations (reload it from registry).",
+					  Application.ProductName);
+			}
 		}
 		
 		/// <summary> Переключает значение указанного параметра проводника в реестре. </summary>
